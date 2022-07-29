@@ -1,0 +1,168 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `standalone/node/src/testnet_fixtures.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>testnet_fixtures.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dkg_standalone_node/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../../dkg_standalone_node/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dkg_standalone_node/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2022 Webb Technologies Inc.</span>
+<span class="comment">//</span>
+<span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="comment">// you may not use this file except in compliance with the License.</span>
+<span class="comment">// You may obtain a copy of the License at</span>
+<span class="comment">//</span>
+<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="comment">//</span>
+<span class="comment">// Unless required by applicable law or agreed to in writing, software</span>
+<span class="comment">// distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="comment">// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="comment">// See the License for the specific language governing permissions and</span>
+<span class="comment">// limitations under the License.</span>
+<span class="comment">//</span>
+<span class="doccomment">//! Testnet fixtures</span>
+
+<span class="kw">use</span> <span class="ident">dkg_runtime_primitives::crypto::AuthorityId</span> <span class="kw">as</span> <span class="ident">DKGId</span>;
+<span class="kw">use</span> <span class="ident">dkg_standalone_runtime::AccountId</span>;
+<span class="kw">use</span> <span class="ident">hex_literal::hex</span>;
+<span class="kw">use</span> <span class="ident">sc_network::config::MultiaddrWithPeerId</span>;
+<span class="kw">use</span> <span class="ident">sp_consensus_aura::sr25519::AuthorityId</span> <span class="kw">as</span> <span class="ident">AuraId</span>;
+<span class="kw">use</span> <span class="ident">sp_core::crypto::UncheckedInto</span>;
+<span class="kw">use</span> <span class="ident">sp_finality_grandpa::AuthorityId</span> <span class="kw">as</span> <span class="ident">GrandpaId</span>;
+
+<span class="doccomment">/// Testnet root key</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_testnet_root_key</span>() -&gt; <span class="ident">AccountId</span> {
+	<span class="comment">// Arana sudo key: 5F9jS22zsSzmWNXKt4kknBsrhVAokEQ9e3UcuBeg21hkzqWz</span>
+	<span class="macro">hex!</span>[<span class="string">&quot;888a3ab33eea2b827f15302cb26af0e007b067ccfbf693faff3aa7ffcfa25925&quot;</span>].<span class="ident">into</span>()
+}
+
+<span class="doccomment">/// Arana bootnodes</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_arana_bootnodes</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MultiaddrWithPeerId</span><span class="op">&gt;</span> {
+	<span class="kw">return</span> <span class="macro">vec!</span>[
+		<span class="string">&quot;/ip4/158.247.202.146/tcp/30333/p2p/12D3KooWJ7PSFvtU3i1LK8E6QmPqHvihs9RTvFw9ZoxGpHGhgNG3&quot;</span>
+			.<span class="ident">parse</span>()
+			.<span class="ident">unwrap</span>(),
+		<span class="string">&quot;/ip4/158.247.210.6/tcp/30333/p2p/12D3KooWQs9faHSzWq4EadVmaBmqTDV2KmEBVQdaXDQLccd9bRjS&quot;</span>
+			.<span class="ident">parse</span>()
+			.<span class="ident">unwrap</span>(),
+		<span class="string">&quot;/ip4/141.164.55.77/tcp/30333/p2p/12D3KooWSBjUxtAxw4Jpb76QY4JySsrr5seB4QhkYVB64sVWbAFH&quot;</span>
+			.<span class="ident">parse</span>()
+			.<span class="ident">unwrap</span>(),
+	]
+}
+
+<span class="doccomment">/// Arana initial authorities</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_arana_initial_authorities</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">AccountId</span>, <span class="ident">AccountId</span>, <span class="ident">AuraId</span>, <span class="ident">GrandpaId</span>, <span class="ident">DKGId</span>)<span class="op">&gt;</span> {
+	<span class="kw">return</span> <span class="macro">vec!</span>[
+		(
+			<span class="macro">hex!</span>[<span class="string">&quot;4e85271af1330e5e9384bd3ac5bdc04c0f8ef5a8cc29c1a8ae483d674164745c&quot;</span>].<span class="ident">into</span>(),
+			<span class="macro">hex!</span>[<span class="string">&quot;804808fb75d16340dc250871138a1a6f1dfa3cab9cc1fbd6f42960f1c39a950d&quot;</span>].<span class="ident">into</span>(),
+			<span class="macro">hex!</span>[<span class="string">&quot;16be9647f91aa5441e300acb8f0d6ccc63e72850202a7947df6a646c1bb4071a&quot;</span>]
+				.<span class="ident">unchecked_into</span>(),
+			<span class="macro">hex!</span>[<span class="string">&quot;71bf01524c555f1e0f6b7dc7243caf00851d3afc543422f98d3eb6bca78acd8c&quot;</span>]
+				.<span class="ident">unchecked_into</span>(),
+			<span class="macro">hex!</span>[<span class="string">&quot;028a4c0781f8369fdd873f8531491f24e2e806fd11a13d828cb4099e6c1045103e&quot;</span>]
+				.<span class="ident">unchecked_into</span>(),
+		),
+		(
+			<span class="macro">hex!</span>[<span class="string">&quot;587c2ef00ec0a1b98af4c655763acd76ece690fccbb255f01663660bc274960d&quot;</span>].<span class="ident">into</span>(),
+			<span class="macro">hex!</span>[<span class="string">&quot;cc195602a63bbdcf2ef4773c86fdbfefe042cb9aa8e3059d02e59a062d9c3138&quot;</span>].<span class="ident">into</span>(),
+			<span class="macro">hex!</span>[<span class="string">&quot;f4e206607ffffcd389c4c60523de5dda5a411d1435f8540b6b6bc181553bd65a&quot;</span>]
+				.<span class="ident">unchecked_into</span>(),
+			<span class="macro">hex!</span>[<span class="string">&quot;61f771ebfdb0a6de08b8e0ca7a39a01f24e7eaa3d1e7f1001e6503490c25c044&quot;</span>]
+				.<span class="ident">unchecked_into</span>(),
+			<span class="macro">hex!</span>[<span class="string">&quot;02427a6cf7f1d7538d9e3e4df834e27db337fd6ef0f530aab4e9799ff865e843fc&quot;</span>]
+				.<span class="ident">unchecked_into</span>(),
+		),
+		(
+			<span class="macro">hex!</span>[<span class="string">&quot;368ea402dbd9c9888ae999d6a799cf36e08673ee53c001dfb4529c149fc2c13b&quot;</span>].<span class="ident">into</span>(),
+			<span class="macro">hex!</span>[<span class="string">&quot;a24f729f085de51eebaeaeca97d6d499761b8f6daeca9b99d754a06ef8bcec3f&quot;</span>].<span class="ident">into</span>(),
+			<span class="macro">hex!</span>[<span class="string">&quot;8e92157e55a72fe0ee78c251a7553af341635bec0aafee1e4189cf8ce52cdd71&quot;</span>]
+				.<span class="ident">unchecked_into</span>(),
+			<span class="macro">hex!</span>[<span class="string">&quot;a41a815db90b9bd3d9ec462f90ba77ba1d627a9fccc9f7847e34c9e9e9b57c90&quot;</span>]
+				.<span class="ident">unchecked_into</span>(),
+			<span class="macro">hex!</span>[<span class="string">&quot;036aec5853fba2662f31ba89e859ac100daa6c58dc8fdaf0555565663f2b99f8f2&quot;</span>]
+				.<span class="ident">unchecked_into</span>(),
+		),
+	]
+}
+</code></pre></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dkg_standalone_node" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (4ca19e09d 2022-04-19)" ></div>
+</body></html>

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["WebbWeight","Weight functions for `pallet_dkg_metadata`."]],"trait":[["WeightInfo",""]]});

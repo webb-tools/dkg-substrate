@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["dkg_message",""],["misbehaviour_report",""],["public_key_gossip",""]]});

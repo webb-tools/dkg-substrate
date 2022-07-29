@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["dkg_standalone_runtime"] = [{"text":"impl <a class=\"trait\" href=\"dkg_standalone_runtime/trait.BuildStorage.html\" title=\"trait dkg_standalone_runtime::BuildStorage\">BuildStorage</a> for <a class=\"struct\" href=\"dkg_standalone_runtime/struct.GenesisConfig.html\" title=\"struct dkg_standalone_runtime::GenesisConfig\">GenesisConfig</a>","synthetic":false,"types":["dkg_standalone_runtime::GenesisConfig"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

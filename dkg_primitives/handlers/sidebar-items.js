@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["decode_proposals",""],["evm",""],["proposer_set_update",""],["substrate",""],["validate_proposals",""]]});

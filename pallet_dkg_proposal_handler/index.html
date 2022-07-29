@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="DKG Proposal Handler Module"><meta name="keywords" content="rust, rustlang, rust-lang, pallet_dkg_proposal_handler"><title>pallet_dkg_proposal_handler - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../pallet_dkg_proposal_handler/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../pallet_dkg_proposal_handler/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"><a href="#">Crate pallet_dkg_proposal_handler</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#modules">Modules</a></li></ul></div></section><div id="sidebar-vars" data-name="pallet_dkg_proposal_handler" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../pallet_dkg_proposal_handler/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">pallet_dkg_proposal_handler</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/pallet_dkg_proposal_handler/lib.rs.html#15-728">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="dkg-proposal-handler-module"><a href="#dkg-proposal-handler-module">DKG Proposal Handler Module</a></h2>
+<p>A pallet to handle unsigned and signed proposals that are submitted for signing by the DKG.</p>
+<h3 id="overview"><a href="#overview">Overview</a></h3>
+<p>The DKG Proposal Handler pallet is the pallet that directly handles the unsigned and
+signed DKG proposals. It is responsible for maintaining the <code>UnsignedProposalQueue</code> that the
+DKG authorities poll from for initiating threshold-signing. It is also responsible for the
+submission of signed proposals back on-chain, which allows for external relayers to listen and
+relay the signed proposals to their destinations.</p>
+<p>The pallet is meant to be used in conjunction with any governance system that processes
+unsigned proposals either directly or indirectly such as the <code>pallet-dkg-proposals</code> pallet,
+which delegates successfully voted upon proposals to the DKG Proposal Handler for processing.
+This pallet also contains root-level functions that allow for the submission of unsigned
+proposals that are useful for Webb Protocol applications. The intention being that tokenholders
+of the Webb Protocol chain can vote through the <code>pallet-democracy</code> or a similar governance
+system to submit unsigned proposals relevant for protocols built on the Webb Protocol’s
+interoperable private application platform.</p>
+<p>The signed proposals are submitted on-chain through an offchain worker and storage mechanism
+that is maintained locally by each DKG authority. The DKG authorities engage in an offchain
+multi-party ECDSA threshold signing protocol to sign the unsigned proposals. Once the DKG
+authorities have signed proposals, they submit the signed proposals on-chain, where the
+signatures are verified against the active DKG’s public key.</p>
+<h4 id="terminology"><a href="#terminology">Terminology</a></h4>
+<ul>
+<li>Unsigned Proposal: A Proposal that is unsigned and is ready to be signed by the DKG
+authorities.</li>
+<li>Signed Proposal: A Proposals that is signed and contains a signature from the active DKG in
+the respective round.</li>
+<li>Unsigned Proposal Queue: A queue of unsigned proposals that are ready for signing.</li>
+<li>Anchor Update Proposal: A proposal for updating the merkle root state of an anchor on some
+compatible blockchain.</li>
+<li>Refresh Proposal: The proposal which rotates a soon-to-be outdated active DKG key to the
+soon-to-be active next DKG key.</li>
+<li>Proposer Set Update Proposal: The proposal which updates the latest proposer set from
+<code>pallet-dkg-proposals</code>.</li>
+</ul>
+<h4 id="implementation"><a href="#implementation">Implementation</a></h4>
+<p>The DKG Proposal Handler pallet is implemented with the primary purpose of handling unsigned
+proposals from the <code>pallet-dkg-proposals</code>, i.e. Anchor Update Proposals, handling forcefully
+submitting unsigned proposals from the integrating chain’s tokenholders, and handling the
+submission of signed proposals back on-chain for data provenance and further processing.</p>
+<p>There are two main methods for submitting unsigned proposals currently implemented:</p>
+<ol>
+<li><code>handle_unsigned_proposal</code> - A generic handler which expects raw Anchor Update Proposals.</li>
+<li><code>force_submit_unsigned_proposal</code> - A root-level extrinsic that allows for the submission of
+all other valid unsigned proposals</li>
+</ol>
+<p>Handled unsigned proposals are added to the <code>UnsignedProposalQueue</code> and are processed by the DKG
+authorities offchain. The queue is polled using a runtime API and the multi-party ECDSA
+threshold signing protocol is initiated for each proposal. Once the DKG authorities have signed
+the unsigned proposal, the proposal is submitted on-chain and an event is emitted.
+Signed proposals are stored in the offchain storage system and polled each block by the offchain
+worker system.</p>
+<p>The types of proposals available for submission is defined in the <code>ProposalType</code> enum as well as
+the <code>DKGPayloadKey</code> enum. The list of currently supported proposals is as follows:</p>
+<ul>
+<li>Refresh: A proposal to refresh the DKG key across authority changes.</li>
+<li>ProposerSetUpdate: A proposal to update the proposer set from <code>pallet-dkg-proposals</code>.</li>
+<li>EVM: A generic EVM transaction proposal.</li>
+<li>AnchorCreate: A proposal to create an anchor on a compatible blockchain.</li>
+<li>AnchorUpdate: A proposal to update an anchor state on a compatible blockchain.</li>
+<li>TokenAdd: A proposal to add a token to system supporting a many-to-one token wrapper.</li>
+<li>TokenRemove: A proposal to remove a token from system supporting a many-to-one token wrapper.</li>
+<li>WrappingFeeUpdate: A proposal to update the wrapping fee for a many-to-one token wrapper.</li>
+<li>ResourceIdUpdate: A proposal to update or add a new resource ID to a system for registering
+resources.</li>
+<li>RescueTokens: A proposal to rescue tokens from a treasury based system.</li>
+<li>MaxDepositLimitUpdate: A proposal to update the maximum deposit limit for an escrow system.</li>
+<li>MinWithdrawalLimitUpdate: A proposal to update the minimal withdrawal limit for an escrow
+system.</li>
+<li>SetVerifier: A proposal to update the verifier for a zkSNARK based system.</li>
+<li>SetTreasuryHandler: A proposal to update the treasury handler for a treasury based system.</li>
+<li>FeeRecipientUpdate: A proposal to update the fee recipient for an escrow system.</li>
+</ul>
+<h4 id="rewards"><a href="#rewards">Rewards</a></h4>
+<p>Currently, there are no extra rewards integrated for successfully signing proposals. This is a
+future feature.</p>
+<h3 id="related-modules"><a href="#related-modules">Related Modules</a></h3>
+<ul>
+<li><a href="https://github.com/paritytech/substrate/tree/master/frame/system"><code>System</code></a></li>
+<li><a href="https://github.com/paritytech/substrate/tree/master/frame/support"><code>Support</code></a></li>
+<li><a href="../../pallet-dkg-proposals"><code>DKG Proposals</code></a></li>
+</ul>
+</div></details><h2 id="reexports" class="small-section-header"><a href="#reexports">Re-exports</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use <a class="mod" href="pallet/index.html" title="mod pallet_dkg_proposal_handler::pallet">pallet</a>::*;</code></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left import-item"><code>pub use weights::<a class="trait" href="weights/trait.WeightInfo.html" title="trait pallet_dkg_proposal_handler::weights::WeightInfo">WeightInfo</a>;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="pallet/index.html" title="pallet_dkg_proposal_handler::pallet mod">pallet</a></div><div class="item-right docblock-short"><p>The module that hosts all the
+<a href="https://docs.substrate.io/v3/runtime/frame">FRAME</a>
+types needed to add this pallet to a
+runtime.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="weights/index.html" title="pallet_dkg_proposal_handler::weights mod">weights</a></div><div class="item-right docblock-short"><p>Autogenerated weights for <code>pallet_dkg_proposal_handler</code></p>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="pallet_dkg_proposal_handler" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (4ca19e09d 2022-04-19)" ></div>
+</body></html>

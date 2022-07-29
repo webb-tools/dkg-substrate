@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["dkg_standalone_runtime"] = [{"text":"impl OpaqueKeys for <a class=\"struct\" href=\"dkg_standalone_runtime/opaque/struct.SessionKeys.html\" title=\"struct dkg_standalone_runtime::opaque::SessionKeys\">SessionKeys</a>","synthetic":false,"types":["dkg_standalone_runtime::opaque::SessionKeys"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

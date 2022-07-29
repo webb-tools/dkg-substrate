@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["dkg_runtime_primitives"] = [{"text":"impl Public for <a class=\"struct\" href=\"dkg_runtime_primitives/offchain/crypto/struct.Public.html\" title=\"struct dkg_runtime_primitives::offchain::crypto::Public\">Public</a>","synthetic":false,"types":["dkg_runtime_primitives::offchain::crypto::Public"]},{"text":"impl Public for <a class=\"struct\" href=\"dkg_runtime_primitives/crypto/struct.Public.html\" title=\"struct dkg_runtime_primitives::crypto::Public\">Public</a>","synthetic":false,"types":["dkg_runtime_primitives::crypto::Public"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

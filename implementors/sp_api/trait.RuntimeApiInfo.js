@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["dkg_runtime_primitives"] = [{"text":"impl&lt;Block:&nbsp;BlockT, AuthorityId, N&gt; RuntimeApiInfo for dyn <a class=\"trait\" href=\"dkg_runtime_primitives/trait.DKGApi.html\" title=\"trait dkg_runtime_primitives::DKGApi\">DKGApi</a>&lt;Block, AuthorityId, N&gt;","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["dkg_gadget","dkg_primitives","dkg_runtime_primitives","dkg_standalone_node","dkg_standalone_runtime","pallet_dkg_metadata","pallet_dkg_proposal_handler","pallet_dkg_proposals"];

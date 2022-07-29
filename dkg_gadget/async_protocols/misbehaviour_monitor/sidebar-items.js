@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["MISBEHAVIOUR_MONITOR_CHECK_INTERVAL","How frequently the misbehaviour monitor checks for misbehaving peers"]],"fn":[["on_keygen_timeout",""]],"struct":[["MisbehaviourMonitor","The purpose of the misbehaviour monitor is to periodically check the Meta handler to ensure that there are no misbehaving clients"]]});

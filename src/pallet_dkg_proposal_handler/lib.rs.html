@@ -1,0 +1,1464 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `pallets/dkg-proposal-handler/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pallet_dkg_proposal_handler/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../../pallet_dkg_proposal_handler/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pallet_dkg_proposal_handler/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+<span id="712">712</span>
+<span id="713">713</span>
+<span id="714">714</span>
+<span id="715">715</span>
+<span id="716">716</span>
+<span id="717">717</span>
+<span id="718">718</span>
+<span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
+<span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
+<span id="726">726</span>
+<span id="727">727</span>
+<span id="728">728</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2022 Webb Technologies Inc.</span>
+<span class="comment">//</span>
+<span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="comment">// you may not use this file except in compliance with the License.</span>
+<span class="comment">// You may obtain a copy of the License at</span>
+<span class="comment">//</span>
+<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="comment">//</span>
+<span class="comment">// Unless required by applicable law or agreed to in writing, software</span>
+<span class="comment">// distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="comment">// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="comment">// See the License for the specific language governing permissions and</span>
+<span class="comment">// limitations under the License.</span>
+
+<span class="doccomment">//! # DKG Proposal Handler Module</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A pallet to handle unsigned and signed proposals that are submitted for signing by the DKG.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Overview</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The DKG Proposal Handler pallet is the pallet that directly handles the unsigned and</span>
+<span class="doccomment">//! signed DKG proposals. It is responsible for maintaining the `UnsignedProposalQueue` that the</span>
+<span class="doccomment">//! DKG authorities poll from for initiating threshold-signing. It is also responsible for the</span>
+<span class="doccomment">//! submission of signed proposals back on-chain, which allows for external relayers to listen and</span>
+<span class="doccomment">//! relay the signed proposals to their destinations.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The pallet is meant to be used in conjunction with any governance system that processes</span>
+<span class="doccomment">//! unsigned proposals either directly or indirectly such as the `pallet-dkg-proposals` pallet,</span>
+<span class="doccomment">//! which delegates successfully voted upon proposals to the DKG Proposal Handler for processing.</span>
+<span class="doccomment">//! This pallet also contains root-level functions that allow for the submission of unsigned</span>
+<span class="doccomment">//! proposals that are useful for Webb Protocol applications. The intention being that tokenholders</span>
+<span class="doccomment">//! of the Webb Protocol chain can vote through the `pallet-democracy` or a similar governance</span>
+<span class="doccomment">//! system to submit unsigned proposals relevant for protocols built on the Webb Protocol&#39;s</span>
+<span class="doccomment">//! interoperable private application platform.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The signed proposals are submitted on-chain through an offchain worker and storage mechanism</span>
+<span class="doccomment">//! that is maintained locally by each DKG authority. The DKG authorities engage in an offchain</span>
+<span class="doccomment">//! multi-party ECDSA threshold signing protocol to sign the unsigned proposals. Once the DKG</span>
+<span class="doccomment">//! authorities have signed proposals, they submit the signed proposals on-chain, where the</span>
+<span class="doccomment">//! signatures are verified against the active DKG&#39;s public key.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Terminology</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - Unsigned Proposal: A Proposal that is unsigned and is ready to be signed by the DKG</span>
+<span class="doccomment">//!   authorities.</span>
+<span class="doccomment">//! - Signed Proposal: A Proposals that is signed and contains a signature from the active DKG in</span>
+<span class="doccomment">//!   the respective round.</span>
+<span class="doccomment">//! - Unsigned Proposal Queue: A queue of unsigned proposals that are ready for signing.</span>
+<span class="doccomment">//! - Anchor Update Proposal: A proposal for updating the merkle root state of an anchor on some</span>
+<span class="doccomment">//!   compatible blockchain.</span>
+<span class="doccomment">//! - Refresh Proposal: The proposal which rotates a soon-to-be outdated active DKG key to the</span>
+<span class="doccomment">//!   soon-to-be active next DKG key.</span>
+<span class="doccomment">//! - Proposer Set Update Proposal: The proposal which updates the latest proposer set from</span>
+<span class="doccomment">//!   `pallet-dkg-proposals`.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Implementation</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The DKG Proposal Handler pallet is implemented with the primary purpose of handling unsigned</span>
+<span class="doccomment">//! proposals from the `pallet-dkg-proposals`, i.e. Anchor Update Proposals, handling forcefully</span>
+<span class="doccomment">//! submitting unsigned proposals from the integrating chain&#39;s tokenholders, and handling the</span>
+<span class="doccomment">//! submission of signed proposals back on-chain for data provenance and further processing.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! There are two main methods for submitting unsigned proposals currently implemented:</span>
+<span class="doccomment">//! 1. `handle_unsigned_proposal` - A generic handler which expects raw Anchor Update Proposals.</span>
+<span class="doccomment">//! 2. `force_submit_unsigned_proposal` - A root-level extrinsic that allows for the submission of</span>
+<span class="doccomment">//! all other valid unsigned proposals</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Handled unsigned proposals are added to the `UnsignedProposalQueue` and are processed by the DKG</span>
+<span class="doccomment">//! authorities offchain. The queue is polled using a runtime API and the multi-party ECDSA</span>
+<span class="doccomment">//! threshold signing protocol is initiated for each proposal. Once the DKG authorities have signed</span>
+<span class="doccomment">//! the unsigned proposal, the proposal is submitted on-chain and an event is emitted.</span>
+<span class="doccomment">//! Signed proposals are stored in the offchain storage system and polled each block by the offchain</span>
+<span class="doccomment">//! worker system.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The types of proposals available for submission is defined in the `ProposalType` enum as well as</span>
+<span class="doccomment">//! the `DKGPayloadKey` enum. The list of currently supported proposals is as follows:</span>
+<span class="doccomment">//! - Refresh: A proposal to refresh the DKG key across authority changes.</span>
+<span class="doccomment">//! - ProposerSetUpdate: A proposal to update the proposer set from `pallet-dkg-proposals`.</span>
+<span class="doccomment">//! - EVM: A generic EVM transaction proposal.</span>
+<span class="doccomment">//! - AnchorCreate: A proposal to create an anchor on a compatible blockchain.</span>
+<span class="doccomment">//! - AnchorUpdate: A proposal to update an anchor state on a compatible blockchain.</span>
+<span class="doccomment">//! - TokenAdd: A proposal to add a token to system supporting a many-to-one token wrapper.</span>
+<span class="doccomment">//! - TokenRemove: A proposal to remove a token from system supporting a many-to-one token wrapper.</span>
+<span class="doccomment">//! - WrappingFeeUpdate: A proposal to update the wrapping fee for a many-to-one token wrapper.</span>
+<span class="doccomment">//! - ResourceIdUpdate: A proposal to update or add a new resource ID to a system for registering</span>
+<span class="doccomment">//!   resources.</span>
+<span class="doccomment">//! - RescueTokens: A proposal to rescue tokens from a treasury based system.</span>
+<span class="doccomment">//! - MaxDepositLimitUpdate: A proposal to update the maximum deposit limit for an escrow system.</span>
+<span class="doccomment">//! - MinWithdrawalLimitUpdate: A proposal to update the minimal withdrawal limit for an escrow</span>
+<span class="doccomment">//!   system.</span>
+<span class="doccomment">//! - SetVerifier: A proposal to update the verifier for a zkSNARK based system.</span>
+<span class="doccomment">//! - SetTreasuryHandler: A proposal to update the treasury handler for a treasury based system.</span>
+<span class="doccomment">//! - FeeRecipientUpdate: A proposal to update the fee recipient for an escrow system.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Rewards</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Currently, there are no extra rewards integrated for successfully signing proposals. This is a</span>
+<span class="doccomment">//! future feature.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Related Modules</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! * [`System`](https://github.com/paritytech/substrate/tree/master/frame/system)</span>
+<span class="doccomment">//! * [`Support`](https://github.com/paritytech/substrate/tree/master/frame/support)</span>
+<span class="doccomment">//! * [`DKG Proposals`](../../pallet-dkg-proposals)</span>
+
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
+
+<span class="kw">use</span> <span class="ident">dkg_runtime_primitives</span>::{
+	<span class="ident">handlers::decode_proposals::decode_proposal_identifier</span>, <span class="ident">ProposalNonce</span>,
+};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pallet</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">sp_std::convert::TryInto</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">mock</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span>;
+
+<span class="kw">use</span> <span class="ident">dkg_runtime_primitives</span>::{
+	<span class="ident">offchain::storage_keys</span>::{<span class="ident">OFFCHAIN_SIGNED_PROPOSALS</span>, <span class="ident">SUBMIT_SIGNED_PROPOSAL_ON_CHAIN_LOCK</span>},
+	<span class="ident">DKGPayloadKey</span>, <span class="ident">OffchainSignedProposals</span>, <span class="ident">ProposalAction</span>, <span class="ident">ProposalHandlerTrait</span>,
+	<span class="ident">StoredUnsignedProposal</span>, <span class="ident">TypedChainId</span>,
+};
+<span class="kw">use</span> <span class="ident">frame_support::pallet_prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">frame_system</span>::{
+	<span class="ident">offchain</span>::{<span class="ident">AppCrypto</span>, <span class="ident">SendSignedTransaction</span>, <span class="ident">Signer</span>},
+	<span class="ident">pallet_prelude::OriginFor</span>,
+};
+<span class="kw">use</span> <span class="ident">sp_runtime</span>::{
+	<span class="ident">offchain</span>::{
+		<span class="ident">storage::StorageValueRef</span>,
+		<span class="ident">storage_lock</span>::{<span class="ident">StorageLock</span>, <span class="ident">Time</span>},
+	},
+	<span class="ident">traits::Saturating</span>,
+};
+<span class="kw">use</span> <span class="ident">sp_std::vec::Vec</span>;
+<span class="kw">use</span> <span class="ident">webb_proposals</span>::{<span class="ident">OnSignedProposal</span>, <span class="ident">Proposal</span>, <span class="ident">ProposalKind</span>};
+
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">weights</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">weights::WeightInfo</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-benchmarks&quot;</span>)]</span>
+<span class="kw">mod</span> <span class="ident">benchmarking</span>;
+
+<span class="attribute">#[<span class="ident">frame_support::pallet</span>]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pallet</span> {
+	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+	<span class="kw">use</span> <span class="ident">dkg_runtime_primitives</span>::{<span class="ident">utils::ensure_signed_by_dkg</span>, <span class="ident">DKGPayloadKey</span>};
+	<span class="kw">use</span> <span class="ident">frame_support::dispatch</span>::{<span class="ident">DispatchError</span>, <span class="ident">DispatchResultWithPostInfo</span>};
+	<span class="kw">use</span> <span class="ident">frame_system</span>::{<span class="ident">offchain::CreateSignedTransaction</span>, <span class="ident">pallet_prelude</span>::<span class="kw-2">*</span>};
+	<span class="kw">use</span> <span class="ident">sp_runtime::traits</span>::{<span class="ident">CheckedSub</span>, <span class="ident">One</span>, <span class="ident">Zero</span>};
+	<span class="kw">use</span> <span class="ident">webb_proposals</span>::{<span class="ident">Proposal</span>, <span class="ident">ProposalKind</span>};
+
+	<span class="doccomment">/// Unsigned proposal for this pallet</span>
+	<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">StoredUnsignedProposalOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span>
+		<span class="ident">StoredUnsignedProposal</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::BlockNumber</span><span class="op">&gt;</span>;
+
+	<span class="doccomment">/// Configure the pallet by specifying the parameters and types on which it depends.</span>
+	<span class="attribute">#[<span class="ident">pallet::config</span>]</span>
+	<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Config</span>:
+		<span class="ident">frame_system::Config</span> <span class="op">+</span> <span class="ident">CreateSignedTransaction</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">pallet_dkg_metadata::Config</span>
+	{
+		<span class="doccomment">/// Because this pallet emits events, it depends on the runtime&#39;s definition of an event.</span>
+		<span class="kw">type</span> <span class="ident">Event</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">IsType</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">frame_system::Config</span><span class="op">&gt;</span><span class="ident">::Event</span><span class="op">&gt;</span>;
+		<span class="doccomment">/// The identifier type for an offchain worker.</span>
+		<span class="kw">type</span> <span class="ident">OffChainAuthId</span>: <span class="ident">AppCrypto</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Public</span>, <span class="ident"><span class="self">Self</span>::Signature</span><span class="op">&gt;</span>;
+		<span class="doccomment">/// The signed proposal handler trait</span>
+		<span class="kw">type</span> <span class="ident">SignedProposalHandler</span>: <span class="ident">OnSignedProposal</span><span class="op">&lt;</span><span class="ident">DispatchError</span><span class="op">&gt;</span>;
+		<span class="doccomment">/// Max number of signed proposal submissions per batch;</span>
+		<span class="attribute">#[<span class="ident">pallet::constant</span>]</span>
+		<span class="kw">type</span> <span class="ident">MaxSubmissionsPerBatch</span>: <span class="ident">Get</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>;
+		<span class="doccomment">/// Max blocks to store an unsigned proposal</span>
+		<span class="attribute">#[<span class="ident">pallet::constant</span>]</span>
+		<span class="kw">type</span> <span class="ident">UnsignedProposalExpiry</span>: <span class="ident">Get</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::BlockNumber</span><span class="op">&gt;</span>;
+		<span class="doccomment">/// Pallet weight information</span>
+		<span class="kw">type</span> <span class="ident">WeightInfo</span>: <span class="ident">WeightInfo</span>;
+	}
+
+	<span class="attribute">#[<span class="ident">pallet::pallet</span>]</span>
+	<span class="attribute">#[<span class="ident">pallet::generate_store</span>(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait</span> <span class="ident">Store</span>)]</span>
+	<span class="attribute">#[<span class="ident">pallet::without_storage_info</span>]</span>
+	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">_</span>);
+
+	<span class="doccomment">/// All unsigned proposals.</span>
+	<span class="attribute">#[<span class="ident">pallet::storage</span>]</span>
+	<span class="attribute">#[<span class="ident">pallet::getter</span>(<span class="kw">fn</span> <span class="ident">unsigned_proposals</span>)]</span>
+	<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UnsignedProposalQueue</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">StorageDoubleMap</span><span class="op">&lt;</span>
+		<span class="kw">_</span>,
+		<span class="ident">Blake2_128Concat</span>,
+		<span class="ident">TypedChainId</span>,
+		<span class="ident">Blake2_128Concat</span>,
+		<span class="ident">DKGPayloadKey</span>,
+		<span class="ident">StoredUnsignedProposalOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+	<span class="op">&gt;</span>;
+
+	<span class="doccomment">/// All signed proposals.</span>
+	<span class="attribute">#[<span class="ident">pallet::storage</span>]</span>
+	<span class="attribute">#[<span class="ident">pallet::getter</span>(<span class="kw">fn</span> <span class="ident">signed_proposals</span>)]</span>
+	<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SignedProposals</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">StorageDoubleMap</span><span class="op">&lt;</span>
+		<span class="kw">_</span>,
+		<span class="ident">Blake2_128Concat</span>,
+		<span class="ident">TypedChainId</span>,
+		<span class="ident">Blake2_128Concat</span>,
+		<span class="ident">DKGPayloadKey</span>,
+		<span class="ident">Proposal</span>,
+	<span class="op">&gt;</span>;
+
+	<span class="attribute">#[<span class="ident">pallet::event</span>]</span>
+	<span class="attribute">#[<span class="ident">pallet::generate_deposit</span>(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">deposit_event</span>)]</span>
+	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> {
+		<span class="doccomment">/// Event Emitted when we encounter a Proposal with invalid Signature.</span>
+		<span class="ident">InvalidProposalSignature</span> {
+			<span class="doccomment">/// The Type of the Proposal.</span>
+			<span class="ident">kind</span>: <span class="ident">ProposalKind</span>,
+			<span class="doccomment">/// Proposal Payload.</span>
+			<span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+			<span class="doccomment">/// The Invalid Signature.</span>
+			<span class="ident">invalid_signature</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+			<span class="doccomment">/// Expected DKG Public Key (the one currently stored on chain).</span>
+			<span class="ident">expected_public_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+			<span class="doccomment">/// The actual one we recovered from the data and signature.</span>
+			<span class="ident">actual_public_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+		},
+		<span class="doccomment">/// Event When a Proposal Gets Signed by DKG.</span>
+		<span class="ident">ProposalSigned</span> {
+			<span class="doccomment">/// The Payload Type or the Key.</span>
+			<span class="ident">key</span>: <span class="ident">DKGPayloadKey</span>,
+			<span class="doccomment">/// The Target Chain.</span>
+			<span class="ident">target_chain</span>: <span class="ident">TypedChainId</span>,
+			<span class="doccomment">/// The Proposal Data.</span>
+			<span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+			<span class="doccomment">/// Signature of the hash of the proposal data.</span>
+			<span class="ident">signature</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+		},
+	}
+
+	<span class="comment">// Errors inform users that something went wrong.</span>
+	<span class="attribute">#[<span class="ident">pallet::error</span>]</span>
+	<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="doccomment">/// Error names should be descriptive.</span>
+		<span class="ident">NoneValue</span>,
+		<span class="doccomment">/// Errors should have helpful documentation associated with them.</span>
+		<span class="ident">StorageOverflow</span>,
+		<span class="doccomment">/// Proposal format is invalid</span>
+		<span class="ident">ProposalFormatInvalid</span>,
+		<span class="doccomment">/// Proposal signature is invalid</span>
+		<span class="ident">ProposalSignatureInvalid</span>,
+		<span class="doccomment">/// No proposal with the ID was found</span>
+		<span class="ident">ProposalDoesNotExists</span>,
+		<span class="doccomment">/// Proposal with the ID has already been submitted</span>
+		<span class="ident">ProposalAlreadyExists</span>,
+		<span class="doccomment">/// Chain id is invalid</span>
+		<span class="ident">ChainIdInvalid</span>,
+		<span class="doccomment">/// Proposal length exceeds max allowed per batch</span>
+		<span class="ident">ProposalsLengthOverflow</span>,
+	}
+
+	<span class="attribute">#[<span class="ident">pallet::hooks</span>]</span>
+	<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">Hooks</span><span class="op">&lt;</span><span class="ident">BlockNumberFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="kw">fn</span> <span class="ident">offchain_worker</span>(<span class="ident">block_number</span>: <span class="ident">T::BlockNumber</span>) {
+			<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::submit_signed_proposal_onchain</span>(<span class="ident">block_number</span>);
+			<span class="macro">frame_support::log::debug!</span>(
+				<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+				<span class="string">&quot;offchain worker result: {:?}&quot;</span>,
+				<span class="ident">res</span>
+			);
+		}
+
+		<span class="doccomment">/// Hook that execute when there is leftover space in a block</span>
+		<span class="doccomment">/// This function will look for any unsigned proposals past `UnsignedProposalExpiry`</span>
+		<span class="doccomment">/// and remove storage.</span>
+		<span class="kw">fn</span> <span class="ident">on_idle</span>(<span class="ident">now</span>: <span class="ident">T::BlockNumber</span>, <span class="kw-2">mut</span> <span class="ident">remaining_weight</span>: <span class="ident">Weight</span>) -&gt; <span class="ident">Weight</span> {
+			<span class="comment">// fetch all unsigned proposals</span>
+			<span class="kw">let</span> <span class="ident">unsigned_proposals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">UnsignedProposalQueue</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::iter</span>().<span class="ident">collect</span>();
+			<span class="kw">let</span> <span class="ident">unsigned_proposals_len</span> <span class="op">=</span> <span class="ident">unsigned_proposals</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+			<span class="ident">remaining_weight</span> <span class="op">=</span>
+				<span class="ident">remaining_weight</span>.<span class="ident">saturating_sub</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">reads</span>(<span class="ident">unsigned_proposals_len</span>));
+
+			<span class="comment">// filter out proposals to delete</span>
+			<span class="kw">let</span> <span class="ident">unsigned_proposal_past_expiry</span> <span class="op">=</span> <span class="ident">unsigned_proposals</span>.<span class="ident">into_iter</span>().<span class="ident">filter</span>(
+				<span class="op">|</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">StoredUnsignedProposal</span> { <span class="ident">timestamp</span>, .. })<span class="op">|</span> {
+					<span class="kw">let</span> <span class="ident">time_passed</span> <span class="op">=</span> <span class="ident">now</span>.<span class="ident">checked_sub</span>(<span class="ident">timestamp</span>).<span class="ident">unwrap_or_default</span>();
+					<span class="ident">time_passed</span> <span class="op">&gt;</span> <span class="ident">T::UnsignedProposalExpiry::get</span>()
+				},
+			);
+
+			<span class="comment">// remove unsigned proposal until we run out of weight</span>
+			<span class="kw">for</span> <span class="ident">expired_proposal</span> <span class="kw">in</span> <span class="ident">unsigned_proposal_past_expiry</span> {
+				<span class="ident">remaining_weight</span> <span class="op">=</span>
+					<span class="ident">remaining_weight</span>.<span class="ident">saturating_sub</span>(<span class="ident">T::DbWeight::get</span>().<span class="ident">writes</span>(<span class="ident">One::one</span>()));
+
+				<span class="kw">if</span> <span class="ident">remaining_weight</span>.<span class="ident">is_zero</span>() {
+					<span class="kw">break</span>
+				}
+
+				<span class="ident">UnsignedProposalQueue</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::remove</span>(<span class="ident">expired_proposal</span>.<span class="number">0</span>, <span class="ident">expired_proposal</span>.<span class="number">1</span>);
+			}
+
+			<span class="ident">remaining_weight</span>
+		}
+	}
+
+	<span class="attribute">#[<span class="ident">pallet::call</span>]</span>
+	<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::submit_signed_proposals</span>(<span class="ident">props</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>))]</span>
+		<span class="attribute">#[<span class="ident">frame_support::transactional</span>]</span>
+		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">submit_signed_proposals</span>(
+			<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+			<span class="ident">props</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Proposal</span><span class="op">&gt;</span>,
+		) -&gt; <span class="ident">DispatchResultWithPostInfo</span> {
+			<span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
+
+			<span class="macro">ensure!</span>(
+				<span class="ident">props</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">T::MaxSubmissionsPerBatch::get</span>() <span class="kw">as</span> <span class="ident">usize</span>,
+				<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ProposalsLengthOverflow</span>
+			);
+
+			<span class="comment">// log the caller, and the props.</span>
+			<span class="macro">frame_support::log::debug!</span>(
+				<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+				<span class="string">&quot;submit_signed_proposal: props: {:?} by {:?}&quot;</span>,
+				<span class="kw-2">&amp;</span><span class="ident">props</span>,
+				<span class="ident">sender</span>
+			);
+
+			<span class="kw">for</span> <span class="ident">prop</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">props</span> {
+				<span class="kw">if</span> <span class="kw">let</span> <span class="ident">Proposal::Signed</span> { <span class="ident">kind</span>, <span class="ident">data</span>, <span class="ident">signature</span> } <span class="op">=</span> <span class="ident">prop</span> {
+					<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">ensure_signed_by_dkg</span>::<span class="op">&lt;</span><span class="ident">pallet_dkg_metadata::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+						<span class="ident">signature</span>,
+						<span class="kw-2">&amp;</span><span class="ident">data</span>[..],
+					);
+					<span class="kw">match</span> <span class="ident">result</span> {
+						<span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+							<span class="comment">// Do nothing, it is all good.</span>
+						},
+						<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
+							<span class="comment">// this is a bad signature.</span>
+							<span class="comment">// we emit it as an event.</span>
+							<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event::InvalidProposalSignature</span> {
+								<span class="ident">kind</span>: <span class="kw-2">*</span><span class="ident">kind</span>,
+								<span class="ident">data</span>: <span class="ident">data</span>.<span class="ident">clone</span>(),
+								<span class="ident">expected_public_key</span>: <span class="ident">e</span>.<span class="ident">expected_public_key</span>(),
+								<span class="ident">actual_public_key</span>: <span class="ident">e</span>.<span class="ident">actual_public_key</span>(),
+								<span class="ident">invalid_signature</span>: <span class="ident">signature</span>.<span class="ident">clone</span>(),
+							});
+							<span class="macro">frame_support::log::error!</span>(
+								<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+								<span class="string">&quot;Invalid proposal signature with kind: {:?}, data: {:?}, sig: {:?}&quot;</span>,
+								<span class="ident">kind</span>,
+								<span class="ident">data</span>,
+								<span class="ident">signature</span>
+							);
+							<span class="comment">// skip it.</span>
+							<span class="kw">continue</span>
+						},
+					}
+
+					<span class="comment">// now we need to log the data and signature</span>
+					<span class="macro">frame_support::log::debug!</span>(
+						<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+						<span class="string">&quot;submit_signed_proposal: data: {:?}, signature: {:?}&quot;</span>,
+						<span class="ident">data</span>,
+						<span class="ident">signature</span>
+					);
+
+					<span class="kw">let</span> <span class="ident">prop</span> <span class="op">=</span> <span class="ident">prop</span>.<span class="ident">clone</span>();
+
+					<span class="ident"><span class="self">Self</span>::handle_signed_proposal</span>(<span class="ident">prop</span>)<span class="question-mark">?</span>;
+
+					<span class="kw">continue</span>
+				}
+
+				<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ProposalSignatureInvalid</span>.<span class="ident">into</span>())
+			}
+
+			<span class="prelude-val">Ok</span>(().<span class="ident">into</span>())
+		}
+
+		<span class="doccomment">/// Force submit an unsigned proposal to the DKG</span>
+		<span class="doccomment">///</span>
+		<span class="doccomment">/// There are certain proposals we&#39;d like to be proposable only</span>
+		<span class="doccomment">/// through root actions. The currently supported proposals are</span>
+		<span class="doccomment">/// 	1. Updating</span>
+		<span class="attribute">#[<span class="ident">pallet::weight</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::WeightInfo::force_submit_unsigned_proposal</span>())]</span>
+		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force_submit_unsigned_proposal</span>(
+			<span class="ident">origin</span>: <span class="ident">OriginFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+			<span class="ident">prop</span>: <span class="ident">Proposal</span>,
+		) -&gt; <span class="ident">DispatchResultWithPostInfo</span> {
+			<span class="comment">// Call must come from root (likely from a democracy proposal passing)</span>
+			<span class="ident">ensure_root</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
+
+			<span class="comment">// We ensure that only certain proposals are valid this way</span>
+			<span class="kw">if</span> <span class="ident">prop</span>.<span class="ident">is_unsigned</span>() {
+				<span class="kw">match</span> <span class="ident">decode_proposal_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">prop</span>) {
+					<span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; {
+						<span class="ident">UnsignedProposalQueue</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::insert</span>(
+							<span class="ident">v</span>.<span class="ident">typed_chain_id</span>,
+							<span class="ident">v</span>.<span class="ident">key</span>,
+							<span class="ident"><span class="self">Self</span>::stored_unsigned_proposal_from_unsigned_proposal</span>(<span class="ident">prop</span>),
+						);
+						<span class="prelude-val">Ok</span>(().<span class="ident">into</span>())
+					},
+					<span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ProposalFormatInvalid</span>.<span class="ident">into</span>()),
+				}
+			} <span class="kw">else</span> {
+				<span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ProposalFormatInvalid</span>.<span class="ident">into</span>())
+			}
+		}
+	}
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">ProposalHandlerTrait</span> <span class="kw">for</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">handle_unsigned_proposal</span>(<span class="ident">proposal</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">_action</span>: <span class="ident">ProposalAction</span>) -&gt; <span class="ident">DispatchResult</span> {
+		<span class="kw">let</span> <span class="ident">proposal</span> <span class="op">=</span> <span class="ident">Proposal::Unsigned</span> { <span class="ident">data</span>: <span class="ident">proposal</span>, <span class="ident">kind</span>: <span class="ident">ProposalKind::AnchorUpdate</span> };
+		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">decode_proposal_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">proposal</span>) {
+			<span class="ident">UnsignedProposalQueue</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::insert</span>(
+				<span class="ident">v</span>.<span class="ident">typed_chain_id</span>,
+				<span class="ident">v</span>.<span class="ident">key</span>,
+				<span class="ident"><span class="self">Self</span>::stored_unsigned_proposal_from_unsigned_proposal</span>(<span class="ident">proposal</span>),
+			);
+			<span class="kw">return</span> <span class="prelude-val">Ok</span>(())
+		}
+
+		<span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ProposalFormatInvalid</span>.<span class="ident">into</span>())
+	}
+
+	<span class="kw">fn</span> <span class="ident">handle_unsigned_proposer_set_update_proposal</span>(
+		<span class="ident">proposal</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+		<span class="ident">_action</span>: <span class="ident">ProposalAction</span>,
+	) -&gt; <span class="ident">DispatchResult</span> {
+		<span class="kw">let</span> <span class="ident">unsigned_proposal</span> <span class="op">=</span>
+			<span class="ident">Proposal::Unsigned</span> { <span class="ident">data</span>: <span class="ident">proposal</span>, <span class="ident">kind</span>: <span class="ident">ProposalKind::ProposerSetUpdate</span> };
+		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">decode_proposal_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">unsigned_proposal</span>) {
+			<span class="ident">UnsignedProposalQueue</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::insert</span>(
+				<span class="ident">v</span>.<span class="ident">typed_chain_id</span>,
+				<span class="ident">v</span>.<span class="ident">key</span>,
+				<span class="ident"><span class="self">Self</span>::stored_unsigned_proposal_from_unsigned_proposal</span>(<span class="ident">unsigned_proposal</span>),
+			);
+
+			<span class="kw">return</span> <span class="prelude-val">Ok</span>(())
+		}
+
+		<span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ProposalFormatInvalid</span>.<span class="ident">into</span>())
+	}
+
+	<span class="kw">fn</span> <span class="ident">handle_unsigned_refresh_proposal</span>(
+		<span class="ident">proposal</span>: <span class="ident">dkg_runtime_primitives::RefreshProposal</span>,
+	) -&gt; <span class="ident">DispatchResult</span> {
+		<span class="kw">let</span> <span class="ident">unsigned_proposal</span> <span class="op">=</span>
+			<span class="ident">Proposal::Unsigned</span> { <span class="ident">data</span>: <span class="ident">proposal</span>.<span class="ident">encode</span>(), <span class="ident">kind</span>: <span class="ident">ProposalKind::Refresh</span> };
+
+		<span class="comment">// Add new refresh proposal to the queue</span>
+		<span class="ident">UnsignedProposalQueue</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::insert</span>(
+			<span class="ident">TypedChainId::None</span>,
+			<span class="ident">DKGPayloadKey::RefreshVote</span>(<span class="ident">proposal</span>.<span class="ident">nonce</span>),
+			<span class="ident"><span class="self">Self</span>::stored_unsigned_proposal_from_unsigned_proposal</span>(<span class="ident">unsigned_proposal</span>),
+		);
+
+		<span class="prelude-val">Ok</span>(())
+	}
+
+	<span class="kw">fn</span> <span class="ident">handle_signed_refresh_proposal</span>(
+		<span class="ident">proposal</span>: <span class="ident">dkg_runtime_primitives::RefreshProposal</span>,
+	) -&gt; <span class="ident">DispatchResult</span> {
+		<span class="comment">// Attempt to remove all previous unsigned refresh proposals too</span>
+		<span class="comment">// This may also remove ProposerSetUpdate proposals that haven&#39;t been signed</span>
+		<span class="comment">// yet, but given that this action is only to clean storage when a refresh</span>
+		<span class="comment">// fails, we can assume that the previous proposer set update will nonetheless</span>
+		<span class="comment">// need to be used to update the governors on the respective webb Apps anyway.</span>
+		<span class="kw">let</span> <span class="ident">remaining_untyped_proposals</span>: <span class="ident">usize</span> <span class="op">=</span>
+			<span class="ident">UnsignedProposalQueue</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::iter_key_prefix</span>(<span class="ident">TypedChainId::None</span>).<span class="ident">count</span>();
+
+		<span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">remaining_untyped_proposals</span> {
+			<span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>;
+			<span class="comment">// Ensure we break when we reach the bottom</span>
+			<span class="kw">if</span> <span class="ident">proposal</span>.<span class="ident">nonce</span>.<span class="ident">saturating_sub</span>(<span class="ident">ProposalNonce</span>(<span class="ident">index</span>)) <span class="op">==</span> <span class="ident">ProposalNonce</span>(<span class="number">0u32</span>) {
+				<span class="kw">break</span>
+			}
+			<span class="comment">// Otherwise continue removing old refresh votes</span>
+			<span class="ident">UnsignedProposalQueue</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::remove</span>(
+				<span class="ident">TypedChainId::None</span>,
+				<span class="ident">DKGPayloadKey::RefreshVote</span>(<span class="ident">proposal</span>.<span class="ident">nonce</span>.<span class="ident">saturating_sub</span>(<span class="ident">ProposalNonce</span>(<span class="ident">index</span>))),
+			);
+		}
+
+		<span class="prelude-val">Ok</span>(())
+	}
+
+	<span class="kw">fn</span> <span class="ident">handle_signed_proposal</span>(<span class="ident">prop</span>: <span class="ident">Proposal</span>) -&gt; <span class="ident">DispatchResult</span> {
+		<span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span>
+			<span class="ident">decode_proposal_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">prop</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">_e</span><span class="op">|</span> <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ProposalFormatInvalid</span>)<span class="question-mark">?</span>;
+		<span class="comment">// Log the chain id and nonce</span>
+		<span class="macro">frame_support::log::debug!</span>(
+			<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+			<span class="string">&quot;submit_signed_proposal: chain: {:?}, payload_key: {:?}&quot;</span>,
+			<span class="ident">id</span>.<span class="ident">typed_chain_id</span>,
+			<span class="ident">id</span>.<span class="ident">key</span>,
+		);
+
+		<span class="macro">ensure!</span>(
+			<span class="ident">UnsignedProposalQueue</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::contains_key</span>(<span class="ident">id</span>.<span class="ident">typed_chain_id</span>, <span class="ident">id</span>.<span class="ident">key</span>),
+			<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ProposalDoesNotExists</span>
+		);
+		<span class="comment">// Log that proposal exist in the unsigned queue</span>
+		<span class="macro">frame_support::log::debug!</span>(
+			<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+			<span class="string">&quot;submit_signed_proposal: proposal exist in the unsigned queue&quot;</span>
+		);
+		<span class="kw">let</span> (<span class="ident">data</span>, <span class="ident">sig</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">prop</span>.<span class="ident">signature</span>() {
+			<span class="prelude-val">Some</span>(<span class="ident">sig</span>) =&gt; (<span class="ident">prop</span>.<span class="ident">data</span>().<span class="ident">clone</span>(), <span class="ident">sig</span>),
+			<span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ProposalSignatureInvalid</span>.<span class="ident">into</span>()),
+		};
+		<span class="macro">ensure!</span>(
+			<span class="ident"><span class="self">Self</span>::validate_proposal_signature</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">sig</span>),
+			<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ProposalSignatureInvalid</span>
+		);
+		<span class="comment">// Log that the signature is valid</span>
+		<span class="macro">frame_support::log::debug!</span>(
+			<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+			<span class="string">&quot;submit_signed_proposal: signature is valid&quot;</span>
+		);
+		<span class="comment">// Update storage</span>
+		<span class="ident">SignedProposals</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::insert</span>(<span class="ident">id</span>.<span class="ident">typed_chain_id</span>, <span class="ident">id</span>.<span class="ident">key</span>, <span class="ident">prop</span>.<span class="ident">clone</span>());
+		<span class="ident">UnsignedProposalQueue</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::remove</span>(<span class="ident">id</span>.<span class="ident">typed_chain_id</span>, <span class="ident">id</span>.<span class="ident">key</span>);
+		<span class="comment">// Emit event so frontend can react to it.</span>
+		<span class="ident"><span class="self">Self</span>::deposit_event</span>(<span class="ident">Event</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::ProposalSigned</span> {
+			<span class="ident">key</span>: <span class="ident">id</span>.<span class="ident">key</span>,
+			<span class="ident">target_chain</span>: <span class="ident">id</span>.<span class="ident">typed_chain_id</span>,
+			<span class="ident">data</span>: <span class="ident">data</span>.<span class="ident">to_vec</span>(),
+			<span class="ident">signature</span>: <span class="ident">sig</span>.<span class="ident">to_vec</span>(),
+		});
+		<span class="comment">// Finally let any handlers handle the signed proposal</span>
+		<span class="ident">T::SignedProposalHandler::on_signed_proposal</span>(<span class="ident">prop</span>)<span class="question-mark">?</span>;
+		<span class="prelude-val">Ok</span>(())
+	}
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="comment">// *** API methods ***</span>
+
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_unsigned_proposals</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">dkg_runtime_primitives::UnsignedProposal</span><span class="op">&gt;</span> {
+		<span class="ident">UnsignedProposalQueue</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::iter</span>()
+			.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">typed_chain_id</span>, <span class="ident">key</span>, <span class="ident">stored_unsigned_proposal</span>)<span class="op">|</span> {
+				<span class="ident">dkg_runtime_primitives::UnsignedProposal</span> {
+					<span class="ident">typed_chain_id</span>,
+					<span class="ident">key</span>,
+					<span class="ident">proposal</span>: <span class="ident">stored_unsigned_proposal</span>.<span class="ident">proposal</span>,
+				}
+			})
+			.<span class="ident">collect</span>()
+	}
+
+	<span class="doccomment">/// Checks whether a signed proposal exists in the `SignedProposals` storage</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_not_existing_proposal</span>(<span class="ident">prop</span>: <span class="kw-2">&amp;</span><span class="ident">Proposal</span>) -&gt; <span class="ident">bool</span> {
+		<span class="kw">if</span> <span class="ident">prop</span>.<span class="ident">is_signed</span>() {
+			<span class="kw">match</span> <span class="ident">decode_proposal_identifier</span>(<span class="ident">prop</span>) {
+				<span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; <span class="op">!</span><span class="ident">SignedProposals</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::contains_key</span>(<span class="ident">v</span>.<span class="ident">typed_chain_id</span>, <span class="ident">v</span>.<span class="ident">key</span>),
+				<span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+			}
+		} <span class="kw">else</span> {
+			<span class="bool-val">false</span>
+		}
+	}
+
+	<span class="doccomment">/// Returns `StoredUnsignedProposal` from proposal by inserting current BlockNumber</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stored_unsigned_proposal_from_unsigned_proposal</span>(
+		<span class="ident">proposal</span>: <span class="ident">Proposal</span>,
+	) -&gt; <span class="ident">StoredUnsignedProposalOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">frame_system::Pallet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::block_number</span>();
+		<span class="ident">StoredUnsignedProposalOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> { <span class="ident">proposal</span>, <span class="ident">timestamp</span> }
+	}
+
+	<span class="comment">// *** Offchain worker methods ***</span>
+
+	<span class="doccomment">/// Offchain worker function that submits signed proposals from the offchain storage on-chain</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// The function submits batches of signed proposals on-chain in batches of</span>
+	<span class="doccomment">/// `T::MaxSubmissionsPerBatch`. Proposals are stored offchain and target specific block numbers</span>
+	<span class="doccomment">/// for submission. This function polls all relevant proposals ready for submission at the</span>
+	<span class="doccomment">/// current block number</span>
+	<span class="kw">fn</span> <span class="ident">submit_signed_proposal_onchain</span>(<span class="ident">block_number</span>: <span class="ident">T::BlockNumber</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">StorageLock</span>::<span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">SUBMIT_SIGNED_PROPOSAL_ON_CHAIN_LOCK</span>);
+		{
+			<span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">lock</span>();
+
+			<span class="kw">let</span> <span class="ident">signer</span> <span class="op">=</span> <span class="ident">Signer</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Config</span><span class="op">&gt;</span><span class="ident">::OffChainAuthId</span><span class="op">&gt;</span><span class="ident">::all_accounts</span>();
+			<span class="kw">if</span> <span class="op">!</span><span class="ident">signer</span>.<span class="ident">can_sign</span>() {
+				<span class="kw">return</span> <span class="prelude-val">Err</span>(
+					<span class="string">&quot;No local accounts available. Consider adding one via `author_insertKey` RPC.&quot;</span>,
+				)
+			}
+			<span class="kw">match</span> <span class="ident"><span class="self">Self</span>::get_next_offchain_signed_proposal</span>(<span class="ident">block_number</span>) {
+				<span class="prelude-val">Ok</span>(<span class="ident">next_proposals</span>) =&gt; {
+					<span class="macro">frame_support::log::debug!</span>(
+						<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+						<span class="string">&quot;submit_signed_proposal_onchain: found {} proposals to submit before filtering\n {:?}&quot;</span>,
+						<span class="ident">next_proposals</span>.<span class="ident">len</span>(), <span class="ident">next_proposals</span>
+					);
+					<span class="comment">// We filter out all proposals that are already on chain</span>
+					<span class="kw">let</span> <span class="ident">filtered_proposals</span> <span class="op">=</span> <span class="ident">next_proposals</span>
+						.<span class="ident">iter</span>()
+						.<span class="ident">cloned</span>()
+						.<span class="ident">filter</span>(<span class="ident"><span class="self">Self</span>::is_not_existing_proposal</span>)
+						.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+					<span class="macro">frame_support::log::debug!</span>(
+						<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+						<span class="string">&quot;submit_signed_proposal_onchain: found {} proposals to submit after filtering\n {:?}&quot;</span>,
+						<span class="ident">filtered_proposals</span>.<span class="ident">len</span>(), <span class="ident">filtered_proposals</span>
+					);
+					<span class="comment">// We split the vector into chunks of `T::MaxSubmissionsPerBatch` length and</span>
+					<span class="comment">// submit those chunks</span>
+					<span class="kw">for</span> <span class="ident">chunk</span> <span class="kw">in</span>
+						<span class="ident">filtered_proposals</span>.<span class="ident">chunks</span>(<span class="ident">T::MaxSubmissionsPerBatch::get</span>() <span class="kw">as</span> <span class="ident">usize</span>)
+					{
+						<span class="kw">let</span> <span class="ident">call</span> <span class="op">=</span> <span class="ident">Call</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::submit_signed_proposals</span> { <span class="ident">props</span>: <span class="ident">chunk</span>.<span class="ident">to_vec</span>() };
+						<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">signer</span>
+							.<span class="ident">send_signed_transaction</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">call</span>.<span class="ident">clone</span>())
+							.<span class="ident">into_iter</span>()
+							.<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">r</span>)<span class="op">|</span> <span class="ident">r</span>)
+							.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+							.<span class="ident">map_err</span>(<span class="op">|</span>()<span class="op">|</span> <span class="string">&quot;Unable to submit unsigned transaction.&quot;</span>);
+						<span class="comment">// Display error if the signed tx fails.</span>
+						<span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_err</span>() {
+							<span class="macro">frame_support::log::error!</span>(
+								<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+								<span class="string">&quot;failure: failed to send unsigned transaction to chain: {:?}&quot;</span>,
+								<span class="ident">call</span>,
+							);
+						} <span class="kw">else</span> {
+							<span class="comment">// log the result of the transaction submission</span>
+							<span class="macro">frame_support::log::debug!</span>(
+								<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+								<span class="string">&quot;Submitted unsigned transaction for signed proposal: {:?}&quot;</span>,
+								<span class="ident">call</span>,
+							);
+						}
+					}
+				},
+				<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
+					<span class="comment">// log the error</span>
+					<span class="macro">frame_support::log::warn!</span>(
+						<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+						<span class="string">&quot;Failed to get next signed proposal: {}&quot;</span>,
+						<span class="ident">e</span>
+					);
+				},
+			};
+			<span class="prelude-val">Ok</span>(())
+		}
+	}
+
+	<span class="doccomment">/// Returns the list of signed proposals ready for on-chain submission at the given</span>
+	<span class="doccomment">/// `block_number`</span>
+	<span class="kw">fn</span> <span class="ident">get_next_offchain_signed_proposal</span>(
+		<span class="ident">block_number</span>: <span class="ident">T::BlockNumber</span>,
+	) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Proposal</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="ident">proposals_ref</span> <span class="op">=</span> <span class="ident">StorageValueRef::persistent</span>(<span class="ident">OFFCHAIN_SIGNED_PROPOSALS</span>);
+
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">all_proposals</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+		<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">proposals_ref</span>.<span class="ident">mutate</span>::<span class="op">&lt;</span><span class="ident">OffchainSignedProposals</span><span class="op">&lt;</span><span class="ident">T::BlockNumber</span><span class="op">&gt;</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> {
+			<span class="kw">match</span> <span class="ident">res</span> {
+				<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">prop_wrapper</span>)) =&gt; {
+					<span class="comment">// log the proposals</span>
+					<span class="macro">frame_support::log::debug!</span>(
+						<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+						<span class="string">&quot;Offchain signed proposals: {:?}&quot;</span>,
+						<span class="ident">prop_wrapper</span>.<span class="ident">proposals</span>
+					);
+					<span class="comment">// log how many proposal batches are left</span>
+					<span class="macro">frame_support::log::debug!</span>(
+						<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+						<span class="string">&quot;Offchain signed proposals left: {}&quot;</span>,
+						<span class="ident">prop_wrapper</span>.<span class="ident">proposals</span>.<span class="ident">len</span>()
+					);
+					<span class="comment">// We get all batches whose submission delay has been satisfied</span>
+					<span class="ident">all_proposals</span> <span class="op">=</span> <span class="ident">prop_wrapper</span>
+						.<span class="ident">proposals</span>
+						.<span class="ident">iter</span>()
+						.<span class="ident">filter_map</span>(
+							<span class="op">|</span>(<span class="ident">props</span>, <span class="ident">submit_at</span>)<span class="op">|</span> {
+								<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">submit_at</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">block_number</span> {
+									<span class="prelude-val">Some</span>(<span class="ident">props</span>)
+								} <span class="kw">else</span> {
+									<span class="prelude-val">None</span>
+								}
+							},
+						)
+						.<span class="ident">flatten</span>()
+						.<span class="ident">cloned</span>()
+						.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+					<span class="comment">// then we need to keep only the batches that are not yet submitted</span>
+					<span class="ident">prop_wrapper</span>.<span class="ident">proposals</span>.<span class="ident">retain</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">submit_at</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">submit_at</span> <span class="op">&gt;</span> <span class="ident">block_number</span>);
+					<span class="prelude-val">Ok</span>(<span class="ident">prop_wrapper</span>)
+				},
+				<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;No signed proposals key stored&quot;</span>),
+				<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
+					<span class="comment">// log the error</span>
+					<span class="macro">frame_support::log::warn!</span>(
+						<span class="ident">target</span>: <span class="string">&quot;dkg_proposal_handler&quot;</span>,
+						<span class="string">&quot;Failed to read offchain signed proposals: {:?}&quot;</span>,
+						<span class="ident">e</span>
+					);
+					<span class="prelude-val">Err</span>(<span class="string">&quot;Error decoding offchain signed proposals&quot;</span>)
+				},
+			}
+		});
+
+		<span class="kw">if</span> <span class="ident">res</span>.<span class="ident">is_err</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">all_proposals</span>.<span class="ident">is_empty</span>() {
+			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Unable to get next proposal batch&quot;</span>)
+		}
+
+		<span class="prelude-val">Ok</span>(<span class="ident">all_proposals</span>)
+	}
+
+	<span class="comment">// *** Validation methods ***</span>
+
+	<span class="kw">fn</span> <span class="ident">validate_proposal_signature</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">signature</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
+		<span class="ident">dkg_runtime_primitives::utils::validate_ecdsa_signature</span>(<span class="ident">data</span>, <span class="ident">signature</span>)
+	}
+
+	<span class="comment">// *** Utility methods ***</span>
+
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-benchmarks&quot;</span>)]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signed_proposals_len</span>() -&gt; <span class="ident">usize</span> {
+		<span class="ident">SignedProposals</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::iter_keys</span>().<span class="ident">count</span>()
+	}
+}
+</code></pre></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pallet_dkg_proposal_handler" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (4ca19e09d 2022-04-19)" ></div>
+</body></html>

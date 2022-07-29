@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["create","https://github.com/webb-tools/protocol-solidity/issues/83 Proposal Data: [ resourceId          - 32 bytes [0..32] functionSig         - 4 bytes  [32..36] nonce               - 4 bytes  [36..40] target              - 32 bytes  [40..72] ] Total Bytes: 32 + 4 + 4 + 32 = 72"]],"struct":[["Bytes32UpdateProposal",""]]});

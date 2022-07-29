@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["derive_resource_id","Helper function to concatenate a chain ID and some bytes to produce a resource ID. The common format is (26 bytes unique ID + 2 bytes chain type + 4 byte chain ID)."]]});

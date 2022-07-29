@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["dkg_runtime_primitives"] = [{"text":"impl AppSignature for <a class=\"struct\" href=\"dkg_runtime_primitives/offchain/crypto/struct.Signature.html\" title=\"struct dkg_runtime_primitives::offchain::crypto::Signature\">Signature</a>","synthetic":false,"types":["dkg_runtime_primitives::offchain::crypto::Signature"]},{"text":"impl AppSignature for <a class=\"struct\" href=\"dkg_runtime_primitives/crypto/struct.Signature.html\" title=\"struct dkg_runtime_primitives::crypto::Signature\">Signature</a>","synthetic":false,"types":["dkg_runtime_primitives::crypto::Signature"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

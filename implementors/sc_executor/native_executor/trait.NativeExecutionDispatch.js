@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["dkg_standalone_node"] = [{"text":"impl NativeExecutionDispatch for <a class=\"struct\" href=\"dkg_standalone_node/service/struct.ExecutorDispatch.html\" title=\"struct dkg_standalone_node::service::ExecutorDispatch\">ExecutorDispatch</a>","synthetic":false,"types":["dkg_standalone_node::service::ExecutorDispatch"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["dkg_standalone_runtime"] = [{"text":"impl MinerConfig for <a class=\"struct\" href=\"dkg_standalone_runtime/struct.WebbMinerConfig.html\" title=\"struct dkg_standalone_runtime::WebbMinerConfig\">WebbMinerConfig</a>","synthetic":false,"types":["dkg_standalone_runtime::WebbMinerConfig"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

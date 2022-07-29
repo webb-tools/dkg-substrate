@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["dkg_gadget"] = [{"text":"impl&lt;C&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/drop/trait.Drop.html\" title=\"trait core::ops::drop::Drop\">Drop</a> for <a class=\"struct\" href=\"dkg_gadget/async_protocols/remote/struct.AsyncProtocolRemote.html\" title=\"struct dkg_gadget::async_protocols::remote::AsyncProtocolRemote\">AsyncProtocolRemote</a>&lt;C&gt;","synthetic":false,"types":["dkg_gadget::async_protocols::remote::AsyncProtocolRemote"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

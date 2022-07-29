@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["dkg_standalone_runtime"] = [{"text":"impl Dispatchable for <a class=\"enum\" href=\"dkg_standalone_runtime/enum.Call.html\" title=\"enum dkg_standalone_runtime::Call\">Call</a>","synthetic":false,"types":["dkg_standalone_runtime::Call"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

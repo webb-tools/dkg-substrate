@@ -1,0 +1,5 @@
+(function() {var implementors = {};
+implementors["pallet_dkg_metadata"] = [{"text":"impl&lt;T&gt; PalletError for <a class=\"enum\" href=\"pallet_dkg_metadata/pallet/enum.Error.html\" title=\"enum pallet_dkg_metadata::pallet::Error\">Error</a>&lt;T&gt;","synthetic":false,"types":["pallet_dkg_metadata::pallet::Error"]}];
+implementors["pallet_dkg_proposal_handler"] = [{"text":"impl&lt;T&gt; PalletError for <a class=\"enum\" href=\"pallet_dkg_proposal_handler/pallet/enum.Error.html\" title=\"enum pallet_dkg_proposal_handler::pallet::Error\">Error</a>&lt;T&gt;","synthetic":false,"types":["pallet_dkg_proposal_handler::pallet::Error"]}];
+implementors["pallet_dkg_proposals"] = [{"text":"impl&lt;T&gt; PalletError for <a class=\"enum\" href=\"pallet_dkg_proposals/pallet/enum.Error.html\" title=\"enum pallet_dkg_proposals::pallet::Error\">Error</a>&lt;T&gt;","synthetic":false,"types":["pallet_dkg_proposals::pallet::Error"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

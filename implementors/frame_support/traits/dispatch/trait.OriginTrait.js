@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["dkg_standalone_runtime"] = [{"text":"impl OriginTrait for <a class=\"struct\" href=\"dkg_standalone_runtime/struct.Origin.html\" title=\"struct dkg_standalone_runtime::Origin\">Origin</a>","synthetic":false,"types":["dkg_standalone_runtime::Origin"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
